@@ -5,6 +5,8 @@ It includes both basic arithmetic functions and scientific functions.
 
 ## Live Demo
 [JavaScript Calculator - Live Demo](https://balaji-p-a.github.io/javascript-calculator/)
+<img width="1837" height="900" alt="Screenshot 2025-11-25 181406" src="https://github.com/user-attachments/assets/4c3f5a8c-7d97-44e9-8d1f-56ab99bc49ba" />
+
 
 ## Features
 
