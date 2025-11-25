@@ -1,0 +1,264 @@
+<!--
+Calculator (Basic + optional Scientific)
+Skills demonstrated: events, functions, string operations, DOM manipulation
+How to use: Save this file as calculator.html and open in a browser.
+Features:
+ - Basic: add, subtract, multiply, divide
+ - Scientific: sqrt, pow, sin, cos, tan, ln, log10
+ - Clear, backspace, equals, keyboard support
+ - History panel (toggleable)
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculator (Basic + Scientific)</title>
+  <style>
+    :root{--bg:#0f1720;--panel:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--glass: rgba(255,255,255,0.03)}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#07122a 0%, #061726 100%);color:#e6eef6}
+    .calculator{width:380px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.6);padding:18px}
+    .top{display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .display{background:var(--glass);padding:12px;border-radius:8px;min-height:72px;display:flex;flex-direction:column;justify-content:center}
+    .expression{font-size:14px;color:var(--muted);min-height:18px}
+    .result{font-size:26px;font-weight:600;word-wrap:break-word}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+    button{padding:14px;border-radius:8px;border:0;background:#0b1722;color:#e6eef6;font-weight:600;cursor:pointer;box-shadow:inset 0 -2px 0 rgba(0,0,0,0.25)}
+    button.op{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+    button.equals{grid-column:span 2;background:var(--accent);color:#052024}
+    .controls{display:flex;gap:8px}
+    .small{padding:10px;font-size:14px}
+    .history{margin-left:12px;width:220px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:10px}
+    .history h4{margin:0 0 8px 0;font-size:14px;color:var(--muted)}
+    .hist-list{max-height:240px;overflow:auto}
+    .hist-item{padding:8px;border-radius:6px;background:rgba(255,255,255,0.02);margin-bottom:8px;font-size:13px}
+    .container{display:flex;gap:12px}
+    .footer{margin-top:10px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+    @media (max-width:900px){.container{flex-direction:column}.history{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="calculator" role="application" aria-label="Calculator">
+    <div class="top">
+      <div style="flex:1">
+        <div class="display" id="display">
+          <div class="expression" id="expression">&nbsp;</div>
+          <div class="result" id="result">0</div>
+        </div>
+        <div class="grid" id="buttons">
+          <!-- row 1 -->
+          <button class="op small" data-action="clear">C</button>
+          <button class="op small" data-action="back">⌫</button>
+          <button class="op small" data-action="percent">%</button>
+          <button class="op small" data-value="/">÷</button>
+
+          <!-- row 2 -->
+          <button data-value="7">7</button>
+          <button data-value="8">8</button>
+          <button data-value="9">9</button>
+          <button class="op small" data-value="*">×</button>
+
+          <!-- row 3 -->
+          <button data-value="4">4</button>
+          <button data-value="5">5</button>
+          <button data-value="6">6</button>
+          <button class="op small" data-value="-">−</button>
+
+          <!-- row 4 -->
+          <button data-value="1">1</button>
+          <button data-value="2">2</button>
+          <button data-value="3">3</button>
+          <button class="op small" data-value="+">+</button>
+
+          <!-- row 5 -->
+          <button data-value="0">0</button>
+          <button data-value=".">.</button>
+          <button class="equals" data-action="equals">=</button>
+          <button class="op small" data-action="toggleSci">Sci</button>
+        </div>
+      </div>
+      <div class="history" id="historyPanel">
+        <h4>History <button id="clearHistory" class="small" style="float:right">Clear</button></h4>
+        <div class="hist-list" id="histList"></div>
+      </div>
+    </div>
+
+    <!-- Scientific pad (hidden by default) -->
+    <div id="sciPad" style="margin-top:12px;display:none">
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+        <button class="op small" data-sci="sqrt">√</button>
+        <button class="op small" data-sci="pow">xʸ</button>
+        <button class="op small" data-sci="sin">sin</button>
+        <button class="op small" data-sci="cos">cos</button>
+        <button class="op small" data-sci="tan">tan</button>
+        <button class="op small" data-sci="log">ln</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>Built with functions, events, strings</div>
+      <div id="kbdHint">Keys: 0-9 . + - * / Enter = Backspace</div>
+    </div>
+  </div>
+
+  <script>
+    // Simple calculator logic using string operations and eval-safe parsing
+    (function(){
+      const expressionEl = document.getElementById('expression');
+      const resultEl = document.getElementById('result');
+      const histList = document.getElementById('histList');
+      const historyPanel = document.getElementById('historyPanel');
+      const sciPad = document.getElementById('sciPad');
+
+      let expression = '';
+      const history = []; // simple in-memory history
+
+      // Helpers
+      function updateDisplay(){
+        expressionEl.textContent = expression || '\u00A0';
+        resultEl.textContent = evaluatePreview(expression);
+      }
+
+      function pushHistory(expr, value){
+        const item = {expr, value, time: new Date().toLocaleString()};
+        history.unshift(item);
+        renderHistory();
+      }
+
+      function renderHistory(){
+        histList.innerHTML = history.map(h=>`<div class="hist-item" title="${escapeHtml(h.expr)} = ${escapeHtml(String(h.value))}"><strong>${escapeHtml(h.expr)}</strong> = ${escapeHtml(String(h.value))}<div style="font-size:11px;color:rgba(255,255,255,0.4)">${escapeHtml(h.time)}</div></div>`).join('');
+      }
+
+      function escapeHtml(s){
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      }
+
+      // Basic safe evaluation (supports + - * / % and Math functions)
+      function safeEval(expr){
+        if(!expr) return '';
+        // Replace unicode operator symbols with JS equivalents
+        const sanitized = expr.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-').replace(/\u221A/g,'sqrt');
+
+        // Disallow letters except Math, sin, cos, tan, pow, sqrt, log, ln
+        if(/[^0-9\.\+\-\*\/\%\(\)eE,\sA-Za-z]/.test(sanitized)) throw new Error('Invalid characters');
+
+        // Replace common function names with Math equivalents
+        let jsExpr = sanitized
+          .replace(/\bln\b/g, 'Math.log')
+          .replace(/\blog\b/g, 'Math.log10')
+          .replace(/\bsin\b/g, 'Math.sin')
+          .replace(/\bcos\b/g, 'Math.cos')
+          .replace(/\btan\b/g, 'Math.tan')
+          .replace(/\bpow\b/g, 'Math.pow')
+          .replace(/\bsqrt\b/g, 'Math.sqrt');
+
+        // Prevent accidental multiple dots in a number sequence by simple check
+        if(/\d*\.\d*\./.test(jsExpr)) throw new Error('Malformed number');
+
+        // Evaluate using Function constructor in a limited scope
+        try{
+          // allow Math in scope
+          // Replace commas with commas (Math.pow expects comma)
+          const fn = new Function('Math', 'return ('+jsExpr+');');
+          const val = fn(Math);
+          if(typeof val === 'number' && !isFinite(val)) throw new Error('Non-finite result');
+          return val;
+        }catch(err){
+          throw new Error('Eval error');
+        }
+      }
+
+      // Evaluate preview (non-throwing)
+      function evaluatePreview(expr){
+        try{ const v = safeEval(expr); return v === '' ? '0' : String(v); }catch(e){ return '' }
+      }
+
+      // Event handlers
+      document.getElementById('buttons').addEventListener('click', e=>{
+        const t = e.target;
+        if(!t) return;
+        if(t.dataset.value){
+          // append value
+          expression += t.dataset.value;
+          updateDisplay();
+        }else if(t.dataset.action){
+          handleAction(t.dataset.action);
+        }
+      });
+
+      function handleAction(action){
+        if(action === 'clear'){
+          expression = '';
+          updateDisplay();
+        }else if(action === 'back'){
+          expression = expression.slice(0,-1);
+          updateDisplay();
+        }else if(action === 'percent'){
+          // convert last number to percent (e.g. 50% -> 0.5)
+          expression = convertLastNumberToPercent(expression);
+          updateDisplay();
+        }else if(action === 'equals'){
+          try{
+            const val = safeEval(expression);
+            pushHistory(expression, val);
+            expression = String(val);
+            updateDisplay();
+          }catch(err){
+            resultEl.textContent = 'Error';
+          }
+        }else if(action === 'toggleSci'){
+          sciPad.style.display = sciPad.style.display === 'none' ? 'block' : 'none';
+        }
+      }
+
+      function convertLastNumberToPercent(expr){
+        // find last contiguous number (with optional dot)
+        const m = expr.match(/(\d*\.?\d+)\s*$/);
+        if(m){
+          const num = parseFloat(m[1]);
+          const replaced = expr.slice(0, m.index) + (num/100);
+          return replaced;
+        }
+        return expr;
+      }
+
+      // Scientific buttons
+      sciPad.addEventListener('click', e=>{
+        const t = e.target;
+        if(t.dataset.sci){
+          const op = t.dataset.sci;
+          if(op === 'sqrt'){
+            // apply sqrt to last number or whole expression
+            expression = 'sqrt(' + (expression || '0') + ')';
+          }else if(op === 'pow'){
+            expression += 'pow(';
+          }else{
+            expression += op + '(';
+          }
+          updateDisplay();
+        }
+      });
+
+      // Keyboard support
+      window.addEventListener('keydown', e=>{
+        if(e.key >= '0' && e.key <= '9') { expression += e.key; updateDisplay(); return; }
+        if(['+','-','*','/','.','%','(',')'].includes(e.key)){ expression += e.key; updateDisplay(); return; }
+        if(e.key === 'Enter' || e.key === '='){ e.preventDefault(); handleAction('equals'); return; }
+        if(e.key === 'Backspace'){ handleAction('back'); return; }
+        if(e.key.toLowerCase() === 'c'){ handleAction('clear'); return; }
+      });
+
+      // History clear
+      document.getElementById('clearHistory').addEventListener('click', ()=>{ history.length = 0; renderHistory(); });
+
+      // Initialization
+      updateDisplay();
+
+      // Expose for debug (optional)
+      window._calc = {getExpression:()=>expression, getHistory:()=>history};
+    })();
+  </script>
+</body>
+</html>
