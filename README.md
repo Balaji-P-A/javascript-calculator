@@ -1,123 +1,69 @@
-JavaScript Calculator (Basic + Scientific)
+# JavaScript Calculator (Basic + Scientific)
 
-A clean and fully functional JavaScript Calculator built using HTML, CSS, and Vanilla JS, featuring both basic arithmetic and scientific functions.
+A simple and fully working JavaScript calculator made using HTML, CSS, and JavaScript.  
+It includes both basic arithmetic functions and scientific functions.
 
-🚀 Live Demo
+## Live Demo
+[JavaScript Calculator - Live Demo](https://balaji-p-a.github.io/javascript-calculator/)
 
-GitHub Pages Link: (Add your link after publishing)
+## Features
 
-📌 Features
+### Basic Calculator
+- Addition (+)
+- Subtraction (-)
+- Multiplication (×)
+- Division (÷)
+- Percentage (%)
+- Backspace and Clear
+- Keyboard input support
 
-Basic Calculator
+### Scientific Calculator
+- Square Root (sqrt)
+- Power (x^y)
+- sin(x)
+- cos(x)
+- tan(x)
+- Natural Log (ln)
+- Log base 10 (log)
 
-Addition (+)
+### UI and Extra Features
+- Clean and modern design
+- Shows both expression and result
+- History of calculations with timestamps
+- Scientific panel toggle button
+- Responsive layout for different screen sizes
 
-Subtraction (−)
+## Project Structure
+calculator.html   # Contains HTML, CSS, and JavaScript in a single file
 
-Multiplication (×)
+## Technologies and Skills Demonstrated
 
-Division (÷)
+### Core Skills
+- JavaScript (ES6): events, functions, expression evaluation, DOM manipulation
+- HTML5: clean structure
+- CSS3: layout, styling, responsive design
+- Debugging and problem-solving
+- Basic UI/UX design
 
-Percentage (%)
+### Technologies Used
+- HTML5  
+- CSS3  
+- JavaScript (ES6)
 
-Backspace & Clear Display
+## How It Works
+- The calculator reads the expression as text
+- Safely evaluates the expression through controlled JavaScript functions
+- Scientific operations use the built-in Math library
+- History is stored during the browser session
 
-Keyboard Input Support
+## Future Improvements
+- Dark/Light mode switch
+- Move CSS and JS into external files
+- Add memory functions (M+, M-, MR)
+- Add degrees/radians toggle for scientific functions
 
-Scientific Calculator
+## License
+This project is open-source and free to use or modify.
 
-Square Root ( √ )
-
-Power ( xʸ )
-
-sin(x)
-
-cos(x)
-
-tan(x)
-
-Natural Log (ln)
-
-Log base 10 (log)
-
-UI + Extra Features
-
-Modern glass-style UI design
-
-Expression preview + result display
-
-Calculation history with timestamps
-
-Toggleable scientific panel
-
-Responsive layout
-
-📂 Project Structure
-
-calculator.html   # Main file containing HTML, CSS, JS logic
-
-🛠️ Technologies & Skills Demonstrated
-
-Core Skills
-
-JavaScript (ES6): Functions, events, safe evaluation, DOM manipulation
-
-HTML5: Semantic layout and structure
-
-CSS3: Responsive design, grid layout, custom UI theme, glassmorphism
-
-Debugging & Problem Solving: Logical expression parsing, error handling
-
-UX/UI Design: Clean layout, mobile-friendly design, interactive elements
-
-Technologies Used
-
-HTML5 – Structure
-
-CSS3 – Styling & layout
-
-JavaScript (ES6) – Calculator logic
-
-📸 Screenshot
-
-Add screenshot if needed (optional)
-
-🧠 How It Works
-
-Uses string-based parsing for expressions
-
-Safe evaluation through a controlled JS function
-
-Math functions mapped to JavaScript Math.*
-
-History stored dynamically in browser memory
-
-🧩 future Improvements
-
-Add Dark/Light themes
-
-Separate JS & CSS into external files
-
-Add memory functions (M+, M-, MR)
-
-Add scientific angle toggle (deg/rad)
-
-📄 License
-
-This project is open-source. You may copy, modify, and use it freely.
-
-👨‍💻 Author
-
-Balaji Prakash
-
-If you want, I can also generate:
-
-A professional LinkedIn post
-
-A project description for GitHub
-
-A CONTRIBUTING.md
-
-A LICENSE file (MIT recommended)
-
-Separate style.css and script.js files
+## Author
+Balaji P
